@@ -22,7 +22,9 @@ import javax.swing.SwingWorker;
  */
 public class SpellingList {
 	// initialising variables to use during quiz TO KEEP TRACK OF QUESTIONS AND ATTEMPT COUNTS
-	
+
+	// Progress Bar Completion
+	int quizProgress;
 	// There are two spelling types: new and review
 	String spellType;
 	// Question Number
@@ -30,17 +32,19 @@ public class SpellingList {
 	// Current Level
 	int currentLevel;
 	// True if question has been attempted (according to current question)
-	boolean attempt = false; 
+	private boolean attempt = false; 
+	private boolean endOfQuestion = false;
+
 	// Current word to spell
 	private String wordToSpell; 	 
 	// There are three types of spelling status: ASKING, ANSWERING and ANSWERED
 	String status;
 	// User's answer is stored here
 	private String userAnswer = "0";
-	
+
 	// This is the SPELLING AID APP
 	private SpellingAid spellingAidApp = null;
-	
+
 	// Number of correct answers
 	private int correctAnsCount = 0;
 
@@ -80,8 +84,8 @@ public class SpellingList {
 		// INITIALISING LISTS TO STORE VALUES
 		initialiseListsToStoreValuesFromWordAndStatsList();
 	}
-	
-// List of getter methods to access state stored during spelling quiz at particular time
+
+	// List of getter methods to access state stored during spelling quiz at particular time
 
 	// get number of questions
 	public int getNoOfQuestions(){
@@ -107,6 +111,7 @@ public class SpellingList {
 	public void createLevelList(int level, String spellingType, SpellingAid spellAidApp){
 		// For every level these following variables start as follows
 		questionNo = 0;
+		quizProgress = 0;
 		correctAnsCount = 0;
 		currentLevel = level;
 		spellType=spellingType;
@@ -182,11 +187,13 @@ public class SpellingList {
 			// stop the quiz and record progress when the whole quiz list has been covered
 			if(questionNo > getNoOfQuestions()){
 				recordFailedAndTriedWordsFromLevel();
-				spellingAidApp.window.append("\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct !\n\n" );
+				
 				if(spellType.equals("new")){
 					// new spelling quiz has a next level option
+					spellingAidApp.window.append("\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct on the first attempt.\n\n" );
 					spellingAidApp.changeToNextState();
 				} else if (spellType.equals("review")){
+					spellingAidApp.window.append("\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct.\n\n" );
 					spellingAidApp.revertToOriginal();
 				}
 			}
@@ -222,6 +229,8 @@ public class SpellingList {
 
 	// Start asking the new question
 	private void askNextQuestion(){
+		// make sure user input field is cleared everytime a question is asked
+		spellingAidApp.userInput.setText("");
 		// < NoOfQuestion because questionNo is used to access the current quiz list's question which starts at 0
 		if(questionNo < getNoOfQuestions()){
 
@@ -229,12 +238,15 @@ public class SpellingList {
 			spellingAidApp.userInput.requestFocus();
 			// attempt is true only when the question has been attempted, so it starts as false
 			attempt = false;
+			// endOfQuestion is true when it is time to move on to the next question
+			endOfQuestion = false;
+
 			// starts at 0
 			wordToSpell = currentQuizList.get(questionNo);
 			// then increment the question no to represent the real question number
 			questionNo++;
-
-			spellingAidApp.window.append("\n Spell word " + questionNo + " of " + currentQuizList.size() + ": ");
+			
+			spellingAidApp.window.append(" Spell word " + questionNo + " of " + currentQuizList.size() + ": ");
 			spellingAidApp.voiceGen.sayText("Please spell word " + questionNo + " of " + currentQuizList.size() + ": " + ",",wordToSpell+",");
 
 			// after ASKING, it is time for ANSWERING
@@ -254,24 +266,25 @@ public class SpellingList {
 			JOptionPane.showMessageDialog(spellingAidApp, "Please enter in ALPHABETICAL LETTERS and use appropriate symbols.", "Input Warning",JOptionPane.WARNING_MESSAGE);
 			// go back to ANSWERING since current answer is invalid
 			status = "ANSWERING";
+
 			return;
 		} 
 
-		// increment the counter which stores the total number of questions asked in the current level
-		if(!attempt){
-			int totalNumberOfQuestionsAskedInLevel = totalAsked.get(currentLevel)+ 1;
-			totalAsked.put(currentLevel, totalNumberOfQuestionsAskedInLevel);
-		}
+
 
 		// if it is valid, start the checking
-		spellingAidApp.window.append(userAnswer+"\n");
+		spellingAidApp.window.append(userAnswer);
 		// turn to lower case for BOTH and then compare
 		if(userAnswer.toLowerCase().equals(wordToSpell.toLowerCase())){
 			// Correct echoed if correct
+			spellingAidApp.window.append("  ✔");
+			spellingAidApp.window.append("\n\n");
 			spellingAidApp.voiceGen.sayText("Correct","");
+
 			//processStarter("echo Correct | festival --tts"); 
 			if(!attempt){
 				Tools.record(spelling_aid_statistics,wordToSpell+" Mastered"); // store as mastered
+				correctAnsCount++; //question answered correctly
 			} else {
 				Tools.record(spelling_aid_statistics,wordToSpell+" Faulted"); // store as faulted
 			}
@@ -283,19 +296,21 @@ public class SpellingList {
 			if(currentFailedList.contains(wordToSpell)){ // remove from failed list if exists
 				currentFailedList.remove(wordToSpell);
 			}
-			correctAnsCount++; //question answered correctly
 			attempt = true; // question has been attempted
+			endOfQuestion = true;
 			// answer is correct and so proceed to ASKING the next question
 			status = "ASKING";
 		} else {
 			if(!attempt){
-				spellingAidApp.window.append("      Incorrect, try once more: ");
+				spellingAidApp.window.append("\n       Incorrect, try once more: ");
 				spellingAidApp.voiceGen.sayText("Incorrect, try once more: "+",",wordToSpell+","+wordToSpell+",");
 				//processStarter("echo Incorrect, try once more: "+wordToSpell+" . "+wordToSpell+" . " + "| festival --tts");
 				// answer is wrong and a second chance is given and so back to ANSWERING
 				status = "ANSWERING";
 			} else {
+				spellingAidApp.window.append("  ✘");
 				spellingAidApp.voiceGen.sayText("Incorrect.",",");
+				spellingAidApp.window.append("\n\n");
 				//processStarter("echo Incorrect | festival --tts");
 				Tools.record(spelling_aid_statistics,wordToSpell+" Failed"); // store as failed
 				if(!currentFailedList.contains(wordToSpell)){ //add to failed list if it doesn't exist
@@ -303,16 +318,23 @@ public class SpellingList {
 				}
 				// answer is wrong on second attempt and so back to ASKING
 				status = "ASKING";
+				endOfQuestion = true;
 			}
 			attempt = true; // question has been attempted
 		}
 
-		if (attempt){
+		// increment the counter which stores the total number of questions asked in the current level
+		if(endOfQuestion){
+			int totalNumberOfQuestionsAskedInLevel = totalAsked.get(currentLevel)+ 1;
+			totalAsked.put(currentLevel, totalNumberOfQuestionsAskedInLevel);
+			quizProgress= quizProgress+10;
+			spellingAidApp.progressBar.setValue(quizProgress);
 			// store as an attempted word after checking to make sure that there are no duplicates in the tried_words list
 			if(!currentTriedList.contains(wordToSpell)){
 				currentTriedList.add(wordToSpell);
 			}
 		}
+		
 	}
 
 	/// This method records everything related to the current level to the file

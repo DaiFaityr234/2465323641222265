@@ -47,8 +47,12 @@ public class VoiceGenerator extends SwingWorker<Void, Void>{
 			double originalStretch = stretch;
 			ClearStatistics.clearFile(schemeFile);
 			if(voice == Voice.DEFAULT){
-				if(changedText.equals("a")){
-					changedText="ae";
+				// to make "a" sound more appropriately
+				if(changedText.equals("a,")){
+					changedText="ae,";
+				}
+				if(changedText.equals("a,a,")){
+					changedText="ae,ae,";
 				}
 				Tools.record(schemeFile, "(voice_rab_diphone)\n" );
 			} else {

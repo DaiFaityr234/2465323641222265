@@ -1,6 +1,7 @@
 package spelling;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -20,6 +21,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -72,6 +74,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 	public JButton _done = new JButton("Done");
 
 	//Creating buttons for controller components
+	public JProgressBar progressBar = new JProgressBar(0, 100);
 	public JLabel spellPrompt = new JLabel("Please spell here:");
 	public JTextField userInput = new JTextField();
 	public JButton enter = new JButton("Enter");
@@ -128,33 +131,71 @@ public class SpellingAid extends JFrame implements ActionListener{
 
 	//Method to add buttons to main GUI frame
 	public void addComponentsToGUI(Container pane) {        
-
+		
+		//Set color for tabs
+		Color tColor = new Color(31,190,214); //spelling (t)ab color
+		Color qColor = new Color(255,113,126); //spelling (q)uiz functionality color
+		Color hColor = new Color(151, 195, 10); //spelling (h)elper color
+		Color bColor = new Color(192, 188, 182); // (b)ackground button color
+		Color pColor = new Color(85, 85, 85); //(p)rogress bar text color
+		Color wColor = new Color(248,248,242); //(w)hite color - better version for eyes
 		//Set button alignment layout for main GUI
 		tabs.setLayout(options);
+		
+		tabs.setBackground(tColor);
 		options.setAlignment(FlowLayout.TRAILING);
 		controller.setLayout(new BoxLayout(controller, BoxLayout.Y_AXIS));
-
+		controller.setBackground(wColor);
+		nextState.setBackground(tColor);
+		window.setBackground(wColor);
 		//Setting sizes of tab buttons
 		newQuiz.setPreferredSize(new Dimension(150, 30));
+		newQuiz.setOpaque(true);
+		newQuiz.setForeground(qColor);
+		newQuiz.setBackground(bColor);
 		tabs.add(newQuiz);
 		reviewMistakes.setPreferredSize(new Dimension(150, 30));
+		reviewMistakes.setOpaque(true);
+		reviewMistakes.setForeground(qColor);
+		reviewMistakes.setBackground(bColor);
 		tabs.add(reviewMistakes);
 		viewStats.setPreferredSize(new Dimension(150, 30));
 		tabs.add(viewStats);
+		viewStats.setOpaque(true);
+		viewStats.setForeground(hColor);
+		viewStats.setBackground(bColor);
 		clearStats.setPreferredSize(new Dimension(150, 30));
+		clearStats.setOpaque(true);
+		clearStats.setForeground(hColor);
+		clearStats.setBackground(bColor);
 		tabs.add(clearStats);
 
 		//Setting sizes of nextState buttons
 		_replayLevel.setPreferredSize(new Dimension(120, 30));
+		_replayLevel.setOpaque(true);
+		_replayLevel.setForeground(qColor);
+		_replayLevel.setBackground(bColor);
 		nextState.add(_replayLevel);
 
 		_nextLevel.setPreferredSize(new Dimension(120, 30));
+		_nextLevel.setOpaque(true);
+		_nextLevel.setForeground(qColor);
+		_nextLevel.setBackground(bColor);
 		nextState.add(_nextLevel);
 
 		_videoReward.setPreferredSize(new Dimension(120, 30));
+		_videoReward.setOpaque(true);
+		_videoReward.setForeground(hColor);
+		_videoReward.setBackground(bColor);
 		nextState.add(_videoReward);
+		_specialVideoReward.setOpaque(true);
+		_specialVideoReward.setForeground(hColor);
+		_specialVideoReward.setBackground(bColor);
 		_specialVideoReward.setPreferredSize(new Dimension(120, 30));
 		nextState.add(_specialVideoReward);
+		_done.setOpaque(true);
+		_done.setForeground(pColor);
+		_done.setBackground(bColor);
 		_done.setPreferredSize(new Dimension(120, 30));
 		nextState.add(_done);
 
@@ -163,17 +204,21 @@ public class SpellingAid extends JFrame implements ActionListener{
 
 		//Setting sizes of spelling components
 		spellPrompt.setPreferredSize(new Dimension(150, 30));
+		spellPrompt.setForeground(hColor);
 		spellPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
 		controller.add(spellPrompt);
+		
 		userInput.setSize(new Dimension(50, 15));
 		userInput.setAlignmentX(Component.CENTER_ALIGNMENT);
 		controller.add(userInput);
 
 		enter.setPreferredSize(new Dimension(150, 30));
 		enter.setAlignmentX(Component.CENTER_ALIGNMENT);
+		enter.setForeground(qColor);
 		controller.add(enter);
 
-
+		progressBar.setStringPainted(true);
+		progressBar.setForeground(pColor);
 
 		//Spacer to format components on right hand side of GUI
 		controller.add(Box.createRigidArea(new Dimension(40,83)));
@@ -181,6 +226,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 		//Setting size for "Listen to the word again" button
 		wordListen.setPreferredSize(new Dimension(150, 40));
 		wordListen.setAlignmentX(Component.CENTER_ALIGNMENT);
+		wordListen.setForeground(qColor);
 		controller.add(wordListen);
 
 		//Spacer to format components on right hand side of GUI
@@ -189,6 +235,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 		//Setting size for "Stop Quiz" button
 		stopQuiz.setPreferredSize(new Dimension(200, 40));
 		stopQuiz.setAlignmentX(Component.CENTER_ALIGNMENT);
+		stopQuiz.setForeground(hColor);
 		controller.add(stopQuiz);
 
 		//Spacer to format components on right hand side of GUI
@@ -197,6 +244,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 		//Setting size for voice selecting combo box
 		voxPrompt.setPreferredSize(new Dimension(150, 30));
 		voxPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
+		voxPrompt.setForeground(hColor);
 		controller.add(voxPrompt);
 		voxSelect.setPreferredSize(new Dimension(150, 30));
 		voxSelect.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -208,6 +256,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 		//Setting size for level indicator at the bottom of the GUI
 		accuracyIndicator.setPreferredSize(new Dimension(40, 30));
 		accuracyIndicator.setAlignmentX(Component.CENTER_ALIGNMENT);
+		accuracyIndicator.setForeground(tColor);
 		controller.add(accuracyIndicator);
 
 		//Arranging tabs only when GUI is opened for the first time
@@ -249,6 +298,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 		frame.setVisible(true);
 		controller.setVisible(false); //hide controller until spelling quiz starts
 		nextState.setVisible(false); //hide nextState until spelling quiz ends
+		
 		// clear the window
 		window.setText("");
 		//Display welcome message to GUI
@@ -279,6 +329,8 @@ public class SpellingAid extends JFrame implements ActionListener{
 
 		// JTextField tracks ENTER button
 		userInput.addActionListener(enterAction);
+		
+		stopQuiz.setToolTipText("You can only use this button during the answering phase in a quiz.");
 
 	}
 
@@ -308,11 +360,19 @@ public class SpellingAid extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent ae) {
 		//Setting internal representation for each option chosen
 		if (ae.getSource() == newQuiz) {
+			stopQuiz.setText("Stop Quiz");
+			// Scroll bar set to an arbitrary value
+			window.setCaretPosition(1);
+			// Scroll bar set to the top
+			window.setCaretPosition(0);
 			spellList = new SpellingList(); //Create new list of 10 words
 			LevelSelector levelSelect = new LevelSelector(); //Create new joptionpane to select level
 			if(levelSelect.getLevel()!=0){ // only when a level is selected, that u start changing the window's content
 
 				frame.getContentPane().remove(tabs);
+				progressBar.setVisible(true);
+				frame.getContentPane().add(progressBar, BorderLayout.NORTH);
+				progressBar.setValue(0);
 				controller.setVisible(true);
 				if(!notFirstTime){
 					// clear the window
@@ -336,6 +396,11 @@ public class SpellingAid extends JFrame implements ActionListener{
 			}
 		}
 		else if (ae.getSource() == reviewMistakes) {
+			stopQuiz.setText("Stop Review");
+			// Scroll bar set to an arbitrary value
+			window.setCaretPosition(1);
+			// Scroll bar set to the top
+			window.setCaretPosition(0);
 			spellList = new SpellingList(); //Create new list of 10 words
 			LevelSelector levelSelect = new LevelSelector(); //Create new joptionpane to select level
 			if(levelSelect.getLevel()!=0){ // only when a level is selected, that u start changing the window's content
@@ -363,6 +428,10 @@ public class SpellingAid extends JFrame implements ActionListener{
 			}
 		}
 		else if (ae.getSource() == viewStats) {
+			// Scroll bar set to an arbitrary value
+			window.setCaretPosition(1);
+			// Scroll bar set to the top
+			window.setCaretPosition(0);
 			// clear the window
 			window.setText("");
 			//Display new spelling message to GUI
@@ -377,6 +446,14 @@ public class SpellingAid extends JFrame implements ActionListener{
 			statsWin.execute();
 		}
 		else if (ae.getSource() == clearStats) {
+			// Scroll bar set to an arbitrary value
+			window.setCaretPosition(1);
+			// Scroll bar set to the top
+			window.setCaretPosition(0);
+			window.setText("");
+			window.append("                                      ====================================\n");
+			window.append("                                                    All Spelling Statistics Cleared \n");
+			window.append("                                      ====================================\n");
 			//CLEAR STATS info dialog
 			JOptionPane.showMessageDialog(this, ClearStatistics.clearStats(), "VOXSPELL CLEAR STATS", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -403,16 +480,22 @@ public class SpellingAid extends JFrame implements ActionListener{
 			voiceGen.setVoice(theVoice);
 		}
 		else if (ae.getSource() == stopQuiz) {
+			progressBar.setVisible(false);
 			if(spellList.status.equals("ANSWERING")){
-				//if(ansChecker!=null){	
-				//	ansChecker.cancel(true);
-				//}
 				window.append("\n\n Quiz has been cancelled. \n\n" );
 				revertToOriginal();	
 				spellList.recordFailedAndTriedWordsFromLevel();
 			}
 		}
 		else if (ae.getSource() == _replayLevel) {
+			stopQuiz.setText("Stop Quiz");
+			// Scroll bar set to an arbitrary value
+			window.setCaretPosition(1);
+			// Scroll bar set to the top
+			window.setCaretPosition(0);
+			progressBar.setValue(0);
+			progressBar.setVisible(true);
+			frame.getContentPane().add(progressBar, BorderLayout.NORTH);
 			controller.setVisible(true);
 			nextState.setVisible(false);
 			// clear the window
@@ -425,12 +508,19 @@ public class SpellingAid extends JFrame implements ActionListener{
 
 			//Start asking questions
 			spellList.createLevelList(spellList.getCurrentLevel(), "new",this);
-			accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Acc: "+spellList.getLvlAccuracy()+"%");
+			accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Accuracy: "+spellList.getLvlAccuracy()+"%");
 			questionAsker = spellList.getQuestionAsker();
 			questionAsker.execute();
 		}
 		else if (ae.getSource() == _nextLevel) {
-
+			stopQuiz.setText("Stop Quiz");
+			// Scroll bar set to an arbitrary value
+			window.setCaretPosition(1);
+			// Scroll bar set to the top
+			window.setCaretPosition(0);
+			progressBar.setValue(0);
+			progressBar.setVisible(true);
+			frame.getContentPane().add(progressBar, BorderLayout.NORTH);
 			controller.setVisible(true);
 			nextState.setVisible(false);
 			int nextLevel = spellList.getCurrentLevel()+1;
@@ -444,7 +534,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 
 			//Start asking questions
 			spellList.createLevelList(nextLevel, "new",this);
-			accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Acc: "+spellList.getLvlAccuracy()+"%");
+			accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Accuracy: "+spellList.getLvlAccuracy()+"%");
 			questionAsker = spellList.getQuestionAsker();
 			questionAsker.execute();
 		}
@@ -456,6 +546,10 @@ public class SpellingAid extends JFrame implements ActionListener{
 		}
 		else if (ae.getSource() == _done) {
 			revertToOriginal(); //Display main GUI again
+			// Scroll bar set to the top
+			window.setCaretPosition(1);
+			// Scroll bar set to the top
+			window.setCaretPosition(0);
 		}
 	}
 
@@ -503,17 +597,23 @@ public class SpellingAid extends JFrame implements ActionListener{
 	// Method that only sets end of quiz options at the bottom of the GUI to be visible
 	public void changeToNextState() {
 		controller.setVisible(false);
-		if (spellList.getCurrentLevel() == 11){
-			_nextLevel.setToolTipText("This button cannot be used now. Level 11 is the highest level.");
-			_nextLevel.setEnabled(false);
-		} 
+		frame.getContentPane().remove(progressBar);
 		if(spellList.getCorrectAns() < 9){
-			_nextLevel.setToolTipText("This button is only enabled if you get at least 9/10 right.");
-			_videoReward.setToolTipText("This button is only enabled if you get at least 9/10 right.");
-			_specialVideoReward.setToolTipText("This button is only enabled if you get at least 9/10 right.");
+			_nextLevel.setToolTipText("This button is only enabled if you get at least 9/10 right on the first attempt.");
+			_videoReward.setToolTipText("This button is only enabled if you get at least 9/10 right on the first attempt.");
+			_specialVideoReward.setToolTipText("This button is only enabled if you get at least 9/10 right on the first attempt.");
 			_nextLevel.setEnabled(false);
 			_videoReward.setEnabled(false);
 			_specialVideoReward.setEnabled(false);
+		} else {
+			_nextLevel.setEnabled(true);
+			_videoReward.setEnabled(true);
+			_specialVideoReward.setEnabled(true);
+		}
+		// disable next level as the thing to do before setting the panel to be visible to make the next level button is disabled at lvl 11
+		if (spellList.getCurrentLevel() == 11){
+			_nextLevel.setToolTipText("This button cannot be used now. Level 11 is the highest level.");
+			_nextLevel.setEnabled(false);
 		} 
 		nextState.setVisible(true);
 	}

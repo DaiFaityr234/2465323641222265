@@ -1,5 +1,6 @@
 package spelling;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,7 +32,6 @@ public class LevelSelector implements ActionListener{
 	final JButton _levelnine = new JButton("Level 9");
 	final JButton _levelten = new JButton("Level 10");
 	final JButton _leveleleven = new JButton("Level 11");
-
 	private int startLevel = 0;
 
 	// Constructor for level selector
@@ -39,14 +39,33 @@ public class LevelSelector implements ActionListener{
 		JOptionPane.showOptionDialog(null,
 				makePanel(),
 				"VOXSPELL LEVEL SELECTOR",
-				JOptionPane.YES_OPTION, JOptionPane.PLAIN_MESSAGE, null, new String[]{"CANCEL"} , null);
+				JOptionPane.YES_OPTION, JOptionPane.PLAIN_MESSAGE, null, new String[]{} , null);
 	}
 
 	// Method to make the main panel of the level selector
 	private JPanel makePanel() {
+		
 		JPanel panel = new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
+		Color qColor = new Color(255,113,126); //spelling (q)uiz functionality color
+		Color hColor = new Color(151, 195, 10); //spelling (h)elper color
+		Color wColor = new Color(248,248,242); //(w)hite color - better version for eyes
+		Color BqColor = qColor.brighter();
+		Color DqColor = qColor.darker();
+		//Set colors
+		levelPrompt.setForeground(hColor);
+		_levelone.setForeground(BqColor);
+		_leveltwo.setForeground(BqColor);
+		_levelthree.setForeground(BqColor);
+		_levelfour.setForeground(BqColor);
+		_levelfive.setForeground(qColor);
+		_levelsix.setForeground(qColor);
+		_levelseven.setForeground(qColor);
+		_leveleight.setForeground(DqColor);
+		_levelnine.setForeground(DqColor);
+		_levelten.setForeground(DqColor);
+		_leveleleven.setForeground(DqColor);
+		panel.setBackground(wColor);
 		//Centre all buttons
 		levelPrompt.setAlignmentX(Component.CENTER_ALIGNMENT);
 		_levelone.setAlignmentX(Component.CENTER_ALIGNMENT);

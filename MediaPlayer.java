@@ -32,9 +32,10 @@ public class MediaPlayer extends JWindow{
 	//Main constructor of MediaPlayer
 	public MediaPlayer(int i) {
 		final JWindow frame = new JWindow();
+		
 		frame.setAlwaysOnTop(true);
 		final EmbeddedMediaPlayer video = mediaPlayerComponent.getMediaPlayer();
-
+		
 		JPanel panel = new JPanel(new BorderLayout());
 		panel.add(mediaPlayerComponent, BorderLayout.CENTER); //add video to centre of window
 
@@ -138,6 +139,10 @@ public class MediaPlayer extends JWindow{
 		btnClose.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// ~~~ weird stuff
+				if(video.isMute()){
+					video.mute();
+				}
 				video.stop();
 				frame.setVisible(false);
 			}
