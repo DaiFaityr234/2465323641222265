@@ -3,7 +3,7 @@ package spelling;
 /**
  * 
  * This class creates a custom JTextPane that easily appends
- * colored text to the main text area
+ * colored text to the main text area with text manipulation
  * @author hchu167
  *
  */
@@ -18,10 +18,11 @@ import javax.swing.text.StyledDocument;
 @SuppressWarnings("serial")
 public class ColorPane extends JTextPane {
 
-  public void append(Color c, String s) { 
+  public void append(Color c, String s, int size) { 
 	  
 	  StyledDocument doc = this.getStyledDocument();
 	  Style style = this.addStyle("adsf", null);
+	  StyleConstants.setFontSize(style, size);
 	  StyleConstants.setForeground(style, c);
 	  try { doc.insertString(doc.getLength(), s,style); }
       catch (BadLocationException e){}

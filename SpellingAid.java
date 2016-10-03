@@ -96,7 +96,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 	public Color bColor = new Color(192, 188, 182); // (b)ackground button color
 	public Color pColor = new Color(85, 85, 85); //(p)rogress bar text color
 	public Color wColor = new Color(248,248,242); //(w)hite color - better version for eyes
-	
+	public Color gColor = new Color(255,223,0); //(g)old color - for 10/10
 	//Layout for main GUI
 	FlowLayout options = new FlowLayout();
 
@@ -303,10 +303,10 @@ public class SpellingAid extends JFrame implements ActionListener{
 		// clear the window
 		window.setText("");
 		//Display welcome message to GUI
-		window.append(qColor,"                                      ====================================\n");
-		window.append(qColor,"                                                     Welcome to the Spelling Aid\n");
-		window.append(qColor,"                                      ====================================\n");
-		window.append(qColor,"                                      Please select from one of the options above:");
+		window.append(pColor,"                                      ====================================\n",18);
+		window.append(pColor,"                                                     Welcome to the Spelling Aid\n",18);
+		window.append(pColor,"                                      ====================================\n",18);
+		window.append(pColor,"                                      Please select from one of the options above:",18);
 
 		//Disable any editing from user
 		window.setEditable(false);
@@ -383,9 +383,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 				// clear the window
 				window.setText("");
 				//Display new spelling message to GUI
-				window.append(qColor,"          ====================================\n");
-				window.append(qColor,"                          New Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n");
-				window.append(qColor,"          ====================================\n\n");
+				window.append(pColor,"          ====================================\n",18);
+				window.append(pColor,"                          New Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n",18);
+				window.append(pColor,"          ====================================\n\n",18);
 
 				//Start asking questions
 				spellList.createLevelList(levelSelect.getLevel(), "new",this);
@@ -415,9 +415,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 				// clear the window
 				window.setText("");
 				//Display new spelling message to GUI
-				window.append(qColor,"            ====================================\n");
-				window.append(qColor,"                         Review Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n");
-				window.append(qColor,"            ====================================\n\n");
+				window.append(pColor,"            ====================================\n",18);
+				window.append(pColor,"                         Review Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n",18);
+				window.append(pColor,"            ====================================\n\n",18);
 
 				spellList.createLevelList(levelSelect.getLevel(), "review",this);
 				accuracyIndicator.setText("Level "+ spellList.getCurrentLevel());
@@ -436,9 +436,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 			// clear the window
 			window.setText("");
 			//Display new spelling message to GUI
-			window.append(qColor,"                                      ====================================\n");
-			window.append(qColor,"                                                           Spelling Aid Statistics \n");
-			window.append(qColor,"                                      ====================================\n");
+			window.append(pColor,"                                      ====================================\n",18);
+			window.append(pColor,"                                                           Spelling Aid Statistics \n",18);
+			window.append(pColor,"                                      ====================================\n",18);
 
 			notFirstTime = false; // to clear the stats
 
@@ -452,9 +452,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 			// Scroll bar set to the top
 			window.setCaretPosition(0);
 			window.setText("");
-			window.append(qColor,"                                      ====================================\n");
-			window.append(qColor,"                                                    All Spelling Statistics Cleared \n");
-			window.append(qColor,"                                      ====================================\n");
+			window.append(pColor,"                                      ====================================\n",18);
+			window.append(pColor,"                                                    All Spelling Statistics Cleared \n",18);
+			window.append(pColor,"                                      ====================================\n",18);
 			//CLEAR STATS info dialog
 			JOptionPane.showMessageDialog(this, ClearStatistics.clearStats(), "VOXSPELL CLEAR STATS", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -483,7 +483,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 		else if (ae.getSource() == stopQuiz) {
 			progressBar.setVisible(false);
 			if(spellList.status.equals("ANSWERING")){
-				window.append(qColor,"\n\n Quiz has been cancelled. \n\n" );
+				window.append(pColor,"\n\n Quiz has been cancelled. \n\n" ,18);
 				revertToOriginal();	
 				spellList.recordFailedAndTriedWordsFromLevel();
 			}
@@ -503,9 +503,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 			window.setText("");
 			//Display new spelling message to GUI
 
-			window.append(qColor,"          ====================================\n");
-			window.append(qColor,"                          New Spelling Quiz ( Level "+ spellList.getCurrentLevel() +" )\n");
-			window.append(qColor,"          ====================================\n\n");
+			window.append(pColor,"          ====================================\n",18);
+			window.append(pColor,"                          New Spelling Quiz ( Level "+ spellList.getCurrentLevel() +" )\n",18);
+			window.append(pColor,"          ====================================\n\n",18);
 
 			//Start asking questions
 			spellList.createLevelList(spellList.getCurrentLevel(), "new",this);
@@ -529,9 +529,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 			window.setText("");
 			//Display new spelling message to GUI
 
-			window.append(qColor,"          ====================================\n");
-			window.append(qColor,"                          New Spelling Quiz ( Level "+ nextLevel +" )\n");
-			window.append(qColor,"          ====================================\n\n");
+			window.append(pColor,"          ====================================\n",18);
+			window.append(pColor,"                          New Spelling Quiz ( Level "+ nextLevel +" )\n",18);
+			window.append(pColor,"          ====================================\n\n",18);
 
 			//Start asking questions
 			spellList.createLevelList(nextLevel, "new",this);

@@ -151,7 +151,7 @@ public class SpellingAidStatistics extends SwingWorker<Void,String>{
 	// this class displays data by publishing them to the JTextArea
 	protected void process(List<String> statsData) {
 		for (String data : statsData) {
-			spellAidApp.window.append(Color.BLACK,data);;
+			spellAidApp.window.append(Color.BLACK,data,12);;
 		}
 	}
 
