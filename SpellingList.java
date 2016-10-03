@@ -176,7 +176,7 @@ public class SpellingList {
 				askNextQuestion();
 			} else {
 				// if noOfQuestions = 0
-				spellingAidApp.window.append(" There are no words to review in this level.\n\n");
+				spellingAidApp.window.append(spellingAidApp.qColor," There are no words to review in this level.\n\n");
 			}
 			return null;
 		}		
@@ -190,10 +190,10 @@ public class SpellingList {
 				
 				if(spellType.equals("new")){
 					// new spelling quiz has a next level option
-					spellingAidApp.window.append("\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct on the first attempt.\n\n" );
+					spellingAidApp.window.append(spellingAidApp.qColor,"\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct on the first attempt.\n\n" );
 					spellingAidApp.changeToNextState();
 				} else if (spellType.equals("review")){
-					spellingAidApp.window.append("\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct.\n\n" );
+					spellingAidApp.window.append(spellingAidApp.qColor,"\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct.\n\n" );
 					spellingAidApp.revertToOriginal();
 				}
 			}
@@ -246,7 +246,7 @@ public class SpellingList {
 			// then increment the question no to represent the real question number
 			questionNo++;
 			
-			spellingAidApp.window.append(" Spell word " + questionNo + " of " + currentQuizList.size() + ": ");
+			spellingAidApp.window.append(spellingAidApp.qColor," Spell word " + questionNo + " of " + currentQuizList.size() + ": ");
 			spellingAidApp.voiceGen.sayText("Please spell word " + questionNo + " of " + currentQuizList.size() + ": " + ",",wordToSpell+",");
 
 			// after ASKING, it is time for ANSWERING
@@ -273,12 +273,12 @@ public class SpellingList {
 
 
 		// if it is valid, start the checking
-		spellingAidApp.window.append(userAnswer);
+		spellingAidApp.window.append(spellingAidApp.qColor,userAnswer);
 		// turn to lower case for BOTH and then compare
 		if(userAnswer.toLowerCase().equals(wordToSpell.toLowerCase())){
 			// Correct echoed if correct
-			spellingAidApp.window.append("  ✔");
-			spellingAidApp.window.append("\n\n");
+			spellingAidApp.window.append(spellingAidApp.qColor,"  ✔");
+			spellingAidApp.window.append(spellingAidApp.qColor,"\n\n");
 			spellingAidApp.voiceGen.sayText("Correct","");
 
 			//processStarter("echo Correct | festival --tts"); 
@@ -302,15 +302,15 @@ public class SpellingList {
 			status = "ASKING";
 		} else {
 			if(!attempt){
-				spellingAidApp.window.append("\n       Incorrect, try once more: ");
+				spellingAidApp.window.append(spellingAidApp.qColor,"\n       Incorrect, try once more: ");
 				spellingAidApp.voiceGen.sayText("Incorrect, try once more: "+",",wordToSpell+","+wordToSpell+",");
 				//processStarter("echo Incorrect, try once more: "+wordToSpell+" . "+wordToSpell+" . " + "| festival --tts");
 				// answer is wrong and a second chance is given and so back to ANSWERING
 				status = "ANSWERING";
 			} else {
-				spellingAidApp.window.append("  ✘");
+				spellingAidApp.window.append(spellingAidApp.qColor,"  ✘");
 				spellingAidApp.voiceGen.sayText("Incorrect.",",");
-				spellingAidApp.window.append("\n\n");
+				spellingAidApp.window.append(spellingAidApp.qColor,"\n\n");
 				//processStarter("echo Incorrect | festival --tts");
 				Tools.record(spelling_aid_statistics,wordToSpell+" Failed"); // store as failed
 				if(!currentFailedList.contains(wordToSpell)){ //add to failed list if it doesn't exist
