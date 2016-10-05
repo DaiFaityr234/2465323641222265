@@ -139,13 +139,19 @@ public class MediaPlayer extends JWindow{
 		btnClose.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// ~~~ weird stuff
 				if(video.isMute()){
 					video.mute();
 				}
 				video.stop();
 				frame.setVisible(false);
+				if (SpellingList.playingTrack2){
+					AudioPlayer.playLoopSound(".ON/Track2.wav",-15.0f);
+				}
+				if (SpellingList.playingTrack1){
+					AudioPlayer.playLoopSound(".ON/Track1.wav",-15.0f);
+				}
 			}
+
 		});
 
 		//Set dimensions of window

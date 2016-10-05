@@ -8,17 +8,29 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 
+/**
+ * This class enables music effects and background music to be played with the spelling application
+ * @author hchu167
+ */
+
 public class AudioPlayer {
 	static double durationInSeconds;
 	static Clip clip;
-	public static void playLoopSound(String file) {
+	
+	// This method plays a looped music clip to ensure GUI is functioning properly
+	public static void playLoopSound(String file, float volume) {
+
 		try {
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(file).getAbsoluteFile());
 			clip = AudioSystem.getClip();
 			clip.open(audioInputStream);
 
 			FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+
+			gainControl.setValue(volume); 
+
 			gainControl.setValue(-15.0f); 
+
 			clip.loop(Clip.LOOP_CONTINUOUSLY);
 			clip.start();
 		} catch(Exception ex) {
@@ -26,7 +38,7 @@ public class AudioPlayer {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public static void playSound(String file) {
 		try {
 			AudioInputStream audioInputStream = AudioSystem.getAudioInputStream(new File(file).getAbsoluteFile());
@@ -36,7 +48,7 @@ public class AudioPlayer {
 			clip = AudioSystem.getClip();
 			clip.open(audioInputStream);
 			FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-			gainControl.setValue(-30.0f); 
+			gainControl.setValue(-30.0f); // soften sound effects
 			clip.start();
 		} catch(Exception ex) {
 			System.out.println("Error with playing sound.");
@@ -48,6 +60,7 @@ public class AudioPlayer {
 		return durationInSeconds;
 	}
 	static void stopSound() {
-		clip.stop();
+		clip.stop(); //stop playing the looped clip
+		clip.close(); // this step is needed to free eclipse resources
 	}
 }

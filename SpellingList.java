@@ -34,7 +34,11 @@ public class SpellingList {
 	// True if question has been attempted (according to current question)
 	private boolean attempt = false; 
 	private boolean endOfQuestion = false;
-	public boolean duringq;
+	public boolean duringq; //keep track of whether the user is still in a question
+	public boolean faulted; //keep track of when word is faulted
+	public static boolean playingTrack1;
+	public static boolean playingTrack2;
+	public boolean playingTrack3;
 	// Current word to spell
 	private String wordToSpell; 	 
 	// There are three types of spelling status: ASKING, ANSWERING and ANSWERED
@@ -176,23 +180,41 @@ public class SpellingList {
 				askNextQuestion();
 			} else {
 				// if noOfQuestions = 0
+				spellingAidApp.window.setText("");
+				spellingAidApp.window.append(spellingAidApp.pColor,"                                ====================================\n",18);
+				spellingAidApp.window.append(spellingAidApp.pColor,"                                             Review Spelling Quiz ( Level "+ spellingAidApp.levelSelect.getLevel() +" )\n",18);
+				spellingAidApp.window.append(spellingAidApp.pColor,"                                ====================================\n\n",18);
 				spellingAidApp.window.append(spellingAidApp.qColor," There are no words to review in this level.\n\n",15);
+				AudioPlayer.playLoopSound(".ON/Track3.wav",-10.0f);
 			}
 			return null;
 		}		
 		protected void done(){
+			
 			if(getNoOfQuestions()==0){
 				spellingAidApp.revertToOriginal();
 			}
 			// stop the quiz and record progress when the whole quiz list has been covered
 			if(questionNo > getNoOfQuestions()){
 				recordFailedAndTriedWordsFromLevel();
-				
+				if (correctAnsCount == 10){
+					AudioPlayer.playLoopSound(".ON/Track2.wav",-15.0f);
+					playingTrack1 = false;
+					playingTrack2 = true;
+					playingTrack3 = false;
+				} else if (correctAnsCount >= 6){
+					AudioPlayer.playLoopSound(".ON/Track1.wav",-15.0f);
+					playingTrack1 = true;
+					playingTrack2 = false;
+					playingTrack3 = false;
+				} else {
+					AudioPlayer.playLoopSound(".ON/Track3.wav",-10.0f);
+				}
 				if(spellType.equals("new")){
 					// new spelling quiz has a next level option
 					if (correctAnsCount == 10){
-						spellingAidApp.window.append(spellingAidApp.gColor,"\n ❂ You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct on the first attempt.❂ \n",15 );
-						spellingAidApp.window.append(spellingAidApp.gColor,"CONGRATULATIONS! YOU HAVE REALLY MASTERED LEVEL "+ currentLevel+"! \n\n",15 );
+						spellingAidApp.window.append(spellingAidApp.gColor,"\n ❂ You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct on the first attempt.❂ \n\n\n",15 );
+						spellingAidApp.window.append(spellingAidApp.gColor,"     CONGRATULATIONS! YOU REALLY DID WELL IN THIS LEVEL "+ currentLevel+" QUIZ! \n\n",15 );
 					} else {
 						spellingAidApp.window.append(spellingAidApp.pColor,"\n You got "+ correctAnsCount +" out of "+ getNoOfQuestions() + " words correct on the first attempt.\n\n",15 );
 					}
@@ -235,7 +257,7 @@ public class SpellingList {
 	}
 
 	// Start asking the new question
-	private void askNextQuestion(){
+	private void askNextQuestion() throws InterruptedException{
 		// make sure user input field is cleared everytime a question is asked
 		spellingAidApp.userInput.setText("");
 		// < NoOfQuestion because questionNo is used to access the current quiz list's question which starts at 0
@@ -248,16 +270,23 @@ public class SpellingList {
 			// endOfQuestion is true when it is time to move on to the next question
 			endOfQuestion = false;
 
+			// faulted boolean is false
+			faulted = false;
 			// starts at 0
 			wordToSpell = currentQuizList.get(questionNo);
 			// then increment the question no to represent the real question number
 			questionNo++;
 			
-			spellingAidApp.window.append(spellingAidApp.pColor," Spell word " + questionNo + " of " + currentQuizList.size() + ": ",15);
-			spellingAidApp.voiceGen.sayText("Please spell word " + questionNo + " of " + currentQuizList.size() + ": " + ",",wordToSpell+",");
+			
+			if (questionNo != 1){
+				Thread.sleep(500);
+			}
+			
 
 			// after ASKING, it is time for ANSWERING
 			status = "ANSWERING";
+			spellingAidApp.window.append(spellingAidApp.pColor," Spell word " + questionNo + " of " + currentQuizList.size() + ": ",15);
+			spellingAidApp.voiceGen.sayText("Please spell word " + questionNo + " of " + currentQuizList.size() + ": " + ",",wordToSpell+",");
 		} else {
 			questionNo++;
 		}
@@ -278,7 +307,6 @@ public class SpellingList {
 		} 
 
 
-
 		// if it is valid, start the checking
 	
 		// turn to lower case for BOTH and then compare
@@ -287,16 +315,24 @@ public class SpellingList {
 			if (duringq){
 				spellingAidApp.window.append(spellingAidApp.tColor,userAnswer,15);
 				spellingAidApp.window.append(spellingAidApp.tColor,"  ✔",15);
+				faulted = true;
 				spellingAidApp.window.append(spellingAidApp.tColor,"\n\n",15);
 			}
 			else {
 				spellingAidApp.window.append(spellingAidApp.hColor,userAnswer,15);
 				spellingAidApp.window.append(spellingAidApp.hColor,"  ✔",15);
+				faulted = false;
 				spellingAidApp.window.append(spellingAidApp.hColor,"\n\n",15);
 			}
-
 			spellingAidApp.voiceGen.sayText("Correct","");
-			
+			if (questionNo != 10 && !spellingAidApp.reviewMode){
+				if (faulted){
+					AudioPlayer.playSound(".ON/Bit1.wav");
+				} else {
+					AudioPlayer.playSound(".ON/Bit3.wav");
+				}
+			}
+
 			//processStarter("echo Correct | festival --tts"); 
 			if(!attempt){
 				Tools.record(spelling_aid_statistics,wordToSpell+" Mastered"); // store as mastered

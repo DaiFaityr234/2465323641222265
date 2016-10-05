@@ -83,11 +83,15 @@ public class SpellingAid extends JFrame implements ActionListener{
 	public JComboBox voxSelect = new JComboBox(new String[]{"Default","Auckland"});
 	public JLabel accuracyIndicator = new JLabel("Level X:");
 	public JButton stopQuiz = new JButton("Stop Quiz");
-
+	
+	//Boolean to check whether quiz is interrupted
+	public boolean quizInterrupted;
+	//Boolean to check whether GUI is in review mode
+	public boolean reviewMode;
 	//Creating main GUI output area
 	public ColorPane window = new ColorPane();
 	public JScrollPane scrollBar = new JScrollPane(window);
-
+	public LevelSelector levelSelect;
 	//Colours
 	
 	public Color tColor = new Color(31,190,214); //spelling (t)ab color
@@ -102,7 +106,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 
 	//To determine whether to clear out welcome text, if true = don't clear
 	boolean notFirstTime; 
-
+	double currentAcc;
 	//This Action object is created to be added as a listener for userInput
 	// so that when enter is pressed, it accepts input
 	Action enterAction = new AbstractAction()
@@ -130,6 +134,14 @@ public class SpellingAid extends JFrame implements ActionListener{
 	public void goOnToNextQuestion(){
 		if(spellList.spellType.equals("new")){
 			accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Accuracy: "+spellList.getLvlAccuracy()+"%");
+			currentAcc = spellList.getLvlAccuracy();
+			if (currentAcc>= 80.0){
+				accuracyIndicator.setForeground(hColor);
+			} else if (currentAcc>= 60.0){
+				accuracyIndicator.setForeground(tColor);
+			} else {
+				accuracyIndicator.setForeground(qColor);
+			}
 		}
 		if(spellList.status.equals("ASKING")){
 			questionAsker=spellList.getQuestionAsker();
@@ -257,7 +269,8 @@ public class SpellingAid extends JFrame implements ActionListener{
 		//Setting size for level indicator at the bottom of the GUI
 		accuracyIndicator.setPreferredSize(new Dimension(40, 30));
 		accuracyIndicator.setAlignmentX(Component.CENTER_ALIGNMENT);
-		accuracyIndicator.setForeground(tColor);
+
+
 		controller.add(accuracyIndicator);
 
 		//Arranging tabs only when GUI is opened for the first time
@@ -303,11 +316,13 @@ public class SpellingAid extends JFrame implements ActionListener{
 		// clear the window
 		window.setText("");
 		//Display welcome message to GUI
-		window.append(pColor,"                                      ====================================\n",18);
-		window.append(pColor,"                                                     Welcome to the Spelling Aid\n",18);
-		window.append(pColor,"                                      ====================================\n",18);
-		window.append(pColor,"                                      Please select from one of the options above:",18);
-
+		window.append(pColor,"                   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n",18);
+		window.append(pColor,"                                              Welcome to the Spelling Aid\n",18);
+		window.append(pColor,"                   +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n",18);
+		window.append(pColor,"                                     Please select from one of the options above:",15);
+		
+		 
+		 
 		//Disable any editing from user
 		window.setEditable(false);
 
@@ -339,6 +354,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 		try {
 			// Preferred look and feel
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+			AudioPlayer.playLoopSound(".ON/Track1.wav",-15.0f);
 		} catch (UnsupportedLookAndFeelException ex) {
 			ex.printStackTrace();
 		} catch (IllegalAccessException ex) {
@@ -361,6 +377,8 @@ public class SpellingAid extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent ae) {
 		//Setting internal representation for each option chosen
 		if (ae.getSource() == newQuiz) {
+			reviewMode = false;
+			quizInterrupted = false;
 			stopQuiz.setText("Stop Quiz");
 			// Scroll bar set to an arbitrary value
 			window.setCaretPosition(1);
@@ -369,7 +387,7 @@ public class SpellingAid extends JFrame implements ActionListener{
 			spellList = new SpellingList(); //Create new list of 10 words
 			LevelSelector levelSelect = new LevelSelector(); //Create new joptionpane to select level
 			if(levelSelect.getLevel()!=0){ // only when a level is selected, that u start changing the window's content
-
+				AudioPlayer.stopSound();
 				frame.getContentPane().remove(tabs);
 				progressBar.setVisible(true);
 				frame.getContentPane().add(progressBar, BorderLayout.NORTH);
@@ -383,13 +401,21 @@ public class SpellingAid extends JFrame implements ActionListener{
 				// clear the window
 				window.setText("");
 				//Display new spelling message to GUI
-				window.append(pColor,"          ====================================\n",18);
-				window.append(pColor,"                          New Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n",18);
-				window.append(pColor,"          ====================================\n\n",18);
-
+				window.append(pColor,"       ====================================\n",18);
+				window.append(pColor,"                       New Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n",18);
+				window.append(pColor,"       ====================================\n\n",18);
+				 
 				//Start asking questions
 				spellList.createLevelList(levelSelect.getLevel(), "new",this);
 				accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Accuracy: "+spellList.getLvlAccuracy()+"%");
+				currentAcc = spellList.getLvlAccuracy();
+				if (currentAcc>= 80.0){
+					accuracyIndicator.setForeground(hColor);
+				} else if (currentAcc>= 60.0){
+					accuracyIndicator.setForeground(tColor);
+				} else {
+					accuracyIndicator.setForeground(qColor);
+				}
 				questionAsker = spellList.getQuestionAsker();
 				questionAsker.execute();
 				//spellingLvl=spellList.getQuestion(); // initiate swing worker
@@ -397,14 +423,18 @@ public class SpellingAid extends JFrame implements ActionListener{
 			}
 		}
 		else if (ae.getSource() == reviewMistakes) {
+			reviewMode = true;
+			quizInterrupted = false;
+			
 			stopQuiz.setText("Stop Review");
 			// Scroll bar set to an arbitrary value
 			window.setCaretPosition(1);
 			// Scroll bar set to the top
 			window.setCaretPosition(0);
 			spellList = new SpellingList(); //Create new list of 10 words
-			LevelSelector levelSelect = new LevelSelector(); //Create new joptionpane to select level
+			levelSelect = new LevelSelector(); //Create new joptionpane to select level
 			if(levelSelect.getLevel()!=0){ // only when a level is selected, that u start changing the window's content
+				AudioPlayer.stopSound();
 				frame.getContentPane().remove(tabs);
 				controller.setVisible(true);				
 				if(!notFirstTime){
@@ -415,9 +445,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 				// clear the window
 				window.setText("");
 				//Display new spelling message to GUI
-				window.append(pColor,"            ====================================\n",18);
-				window.append(pColor,"                         Review Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n",18);
-				window.append(pColor,"            ====================================\n\n",18);
+				window.append(pColor,"       ====================================\n",18);
+				window.append(pColor,"                       Review Spelling Quiz ( Level "+ levelSelect.getLevel() +" )\n",18);
+				window.append(pColor,"       ====================================\n\n",18);
 
 				spellList.createLevelList(levelSelect.getLevel(), "review",this);
 				accuracyIndicator.setText("Level "+ spellList.getCurrentLevel());
@@ -436,9 +466,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 			// clear the window
 			window.setText("");
 			//Display new spelling message to GUI
-			window.append(pColor,"                                      ====================================\n",18);
-			window.append(pColor,"                                                           Spelling Aid Statistics \n",18);
-			window.append(pColor,"                                      ====================================\n",18);
+			window.append(pColor,"                               ====================================\n",18);
+			window.append(pColor,"                                                      Spelling Aid Statistics \n",18);
+			window.append(pColor,"                               ====================================\n",18);
 
 			notFirstTime = false; // to clear the stats
 
@@ -452,9 +482,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 			// Scroll bar set to the top
 			window.setCaretPosition(0);
 			window.setText("");
-			window.append(pColor,"                                      ====================================\n",18);
-			window.append(pColor,"                                                    All Spelling Statistics Cleared \n",18);
-			window.append(pColor,"                                      ====================================\n",18);
+			window.append(pColor,"                               ====================================\n",18);
+			window.append(pColor,"                                              All Spelling Statistics Cleared \n",18);
+			window.append(pColor,"                               ====================================\n",18);
 			//CLEAR STATS info dialog
 			JOptionPane.showMessageDialog(this, ClearStatistics.clearStats(), "VOXSPELL CLEAR STATS", JOptionPane.INFORMATION_MESSAGE);
 		}
@@ -481,19 +511,23 @@ public class SpellingAid extends JFrame implements ActionListener{
 			voiceGen.setVoice(theVoice);
 		}
 		else if (ae.getSource() == stopQuiz) {
-			progressBar.setVisible(false);
 			if(spellList.status.equals("ANSWERING")){
+				quizInterrupted = true;
 				window.append(pColor,"\n\n Quiz has been cancelled. \n\n" ,18);
 				revertToOriginal();	
+				progressBar.setVisible(false);
 				spellList.recordFailedAndTriedWordsFromLevel();
 			}
 		}
 		else if (ae.getSource() == _replayLevel) {
+			reviewMode = false;
+			quizInterrupted = false;
 			stopQuiz.setText("Stop Quiz");
 			// Scroll bar set to an arbitrary value
 			window.setCaretPosition(1);
 			// Scroll bar set to the top
 			window.setCaretPosition(0);
+			AudioPlayer.stopSound();
 			progressBar.setValue(0);
 			progressBar.setVisible(true);
 			frame.getContentPane().add(progressBar, BorderLayout.NORTH);
@@ -503,22 +537,33 @@ public class SpellingAid extends JFrame implements ActionListener{
 			window.setText("");
 			//Display new spelling message to GUI
 
-			window.append(pColor,"          ====================================\n",18);
-			window.append(pColor,"                          New Spelling Quiz ( Level "+ spellList.getCurrentLevel() +" )\n",18);
-			window.append(pColor,"          ====================================\n\n",18);
+			window.append(pColor,"       ====================================\n",18);
+			window.append(pColor,"                       New Spelling Quiz ( Level "+ spellList.getCurrentLevel() +" )\n",18);
+			window.append(pColor,"       ====================================\n\n",18);
 
 			//Start asking questions
 			spellList.createLevelList(spellList.getCurrentLevel(), "new",this);
 			accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Accuracy: "+spellList.getLvlAccuracy()+"%");
+			currentAcc = spellList.getLvlAccuracy();
+			if (currentAcc>= 80.0){
+				accuracyIndicator.setForeground(hColor);
+			} else if (currentAcc>= 60.0){
+				accuracyIndicator.setForeground(tColor);
+			} else {
+				accuracyIndicator.setForeground(qColor);
+			}
 			questionAsker = spellList.getQuestionAsker();
 			questionAsker.execute();
 		}
 		else if (ae.getSource() == _nextLevel) {
+			reviewMode = false;
+			quizInterrupted = false;
 			stopQuiz.setText("Stop Quiz");
 			// Scroll bar set to an arbitrary value
 			window.setCaretPosition(1);
 			// Scroll bar set to the top
 			window.setCaretPosition(0);
+			AudioPlayer.stopSound();
 			progressBar.setValue(0);
 			progressBar.setVisible(true);
 			frame.getContentPane().add(progressBar, BorderLayout.NORTH);
@@ -529,20 +574,30 @@ public class SpellingAid extends JFrame implements ActionListener{
 			window.setText("");
 			//Display new spelling message to GUI
 
-			window.append(pColor,"          ====================================\n",18);
-			window.append(pColor,"                          New Spelling Quiz ( Level "+ nextLevel +" )\n",18);
-			window.append(pColor,"          ====================================\n\n",18);
+			window.append(pColor,"       ====================================\n",18);
+			window.append(pColor,"                       New Spelling Quiz ( Level "+ nextLevel +" )\n",18);
+			window.append(pColor,"       ====================================\n\n",18);
 
 			//Start asking questions
 			spellList.createLevelList(nextLevel, "new",this);
 			accuracyIndicator.setText("Level "+ spellList.getCurrentLevel()+" Accuracy: "+spellList.getLvlAccuracy()+"%");
+			currentAcc = spellList.getLvlAccuracy();
+			if (currentAcc>= 80.0){
+				accuracyIndicator.setForeground(hColor);
+			} else if (currentAcc>= 60.0){
+				accuracyIndicator.setForeground(tColor);
+			} else {
+				accuracyIndicator.setForeground(qColor);
+			}
 			questionAsker = spellList.getQuestionAsker();
 			questionAsker.execute();
 		}
 		else if (ae.getSource() == _videoReward) {
+			AudioPlayer.stopSound();
 			new MediaPlayer(1);
 		}
 		else if (ae.getSource() == _specialVideoReward) {
+			AudioPlayer.stopSound();
 			new MediaPlayer(2);
 		}
 		else if (ae.getSource() == _done) {
@@ -590,6 +645,9 @@ public class SpellingAid extends JFrame implements ActionListener{
 
 	// Method that only sets tabs at the top of the GUI to be visible
 	public void revertToOriginal() {
+		if (quizInterrupted){
+			AudioPlayer.playLoopSound(".ON/Track3.wav",-10.0f);
+		}
 		frame.getContentPane().add(tabs, BorderLayout.NORTH);
 		controller.setVisible(false);
 		nextState.setVisible(false);

@@ -1,6 +1,5 @@
 package spelling;
 
-import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -151,7 +150,7 @@ public class SpellingAidStatistics extends SwingWorker<Void,String>{
 	// this class displays data by publishing them to the JTextArea
 	protected void process(List<String> statsData) {
 		for (String data : statsData) {
-			spellAidApp.window.append(Color.BLACK,data,12);;
+			spellAidApp.window.append(spellAidApp.qColor,data,15);;
 		}
 	}
 
